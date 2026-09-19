@@ -1,5 +1,5 @@
 -- ============================================================
--- RakshaSetu — Seed Data: ROURKELA, ODISHA
+-- ResQ — Seed Data: ROURKELA, ODISHA
 -- Idempotent: clears old demo data, then inserts Rourkela set.
 -- Run in Supabase SQL Editor. Re-runnable anytime.
 --

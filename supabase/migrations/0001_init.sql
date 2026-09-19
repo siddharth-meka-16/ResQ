@@ -1,5 +1,5 @@
 -- ============================================================
--- RakshaSetu — Initial Schema (Phase 1)
+-- ResQ — Initial Schema (Phase 1)
 -- Run this in Supabase Dashboard -> SQL Editor -> New query
 -- ============================================================
 

@@ -1,5 +1,5 @@
 -- ============================================================
--- RakshaSetu — Field team manages its own team row
+-- ResQ — Field team manages its own team row
 -- Run in Supabase SQL Editor AFTER 0001..0007
 -- ============================================================
 

@@ -1,5 +1,5 @@
 -- ============================================================
--- RakshaSetu — Phase 5: report clustering
+-- ResQ — Phase 5: report clustering
 -- Run in Supabase SQL Editor AFTER 0001 + 0002
 -- ============================================================
 

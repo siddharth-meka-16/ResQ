@@ -28,6 +28,7 @@ export function Sidebar({
         { href: "/dashboard/map", label: dict.nav.liveMap, glyph: "M" },
         { href: "/dashboard/incidents", label: dict.nav.incidents, glyph: "I" },
         { href: "/dashboard/assignments", label: dict.nav.assignments, glyph: "A" },
+        { href: "/dashboard/replanning", label: "Route Replanning", glyph: "R" },
       ],
     },
     {
@@ -35,11 +36,16 @@ export function Sidebar({
       items: [
         { href: "/dashboard/resources", label: dict.nav.teams, glyph: "T" },
         { href: "/dashboard/shelters", label: dict.nav.shelters, glyph: "S" },
+        { href: "/hospitals", label: "Hospital ICU Beds", glyph: "H" },
+        { href: "/reunite", label: "Reunite (Missing Persons)", glyph: "Re" },
       ],
     },
     {
       title: dict.nav.tools,
-      items: [{ href: "/dashboard/simulation", label: dict.nav.simulation, glyph: "Si" }],
+      items: [
+        { href: "/dashboard/analytics", label: "Historical Learning (AI)", glyph: "AI" },
+        { href: "/dashboard/simulation", label: dict.nav.simulation, glyph: "Si" },
+      ],
     },
   ];
 

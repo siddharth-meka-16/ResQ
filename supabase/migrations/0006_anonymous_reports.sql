@@ -1,5 +1,5 @@
 -- ============================================================
--- RakshaSetu — Anonymous incident reports
+-- ResQ — Anonymous incident reports
 -- Run in Supabase SQL Editor AFTER 0001..0005
 -- ============================================================
 

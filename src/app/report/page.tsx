@@ -110,7 +110,12 @@ export default function ReportPage() {
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? "Could not submit report");
 
-      setIncidentNumber(json.incident.incident_number);
+      setIncidentNumber(
+        json.incident?.incident_number ||
+          (json.incident?.id
+            ? `INC-${json.incident.id.slice(0, 6).toUpperCase()}`
+            : "INC-RECORDED")
+      );
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not submit report");
     } finally {

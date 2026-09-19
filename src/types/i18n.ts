@@ -1,4 +1,4 @@
-export type Locale = "en" | "hi" | "or";
+export type Locale = "en" | "hi";
 
 export interface LanguageOption {
   code: Locale;
@@ -10,7 +10,6 @@ export interface LanguageOption {
 export const SUPPORTED_LANGUAGES: LanguageOption[] = [
   { code: "en", label: "English", nativeName: "English", shortLabel: "EN" },
   { code: "hi", label: "Hindi", nativeName: "हिन्दी", shortLabel: "हिं" },
-  { code: "or", label: "Odia", nativeName: "ଓଡ଼ିଆ", shortLabel: "ଓଡ଼" },
 ];
 
 export interface TranslationDictionary {

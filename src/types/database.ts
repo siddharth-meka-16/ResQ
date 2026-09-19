@@ -180,6 +180,7 @@ export type Assignment = {
   id: string;
   incident_id: string;
   resource_id: string;
+  team_id?: string;
   assigned_by_id: string | null;
   status: AssignmentStatus;
   allocation_score: number | null;
@@ -243,6 +244,67 @@ export type AllocationWeight = {
   updated_at: string;
 }
 
+export type Hospital = {
+  id: string;
+  name: string;
+  address: string;
+  latitude: number;
+  longitude: number;
+  total_icu_beds: number;
+  available_icu_beds: number;
+  total_general_beds: number;
+  available_general_beds: number;
+  oxygen_reserve_hours: number;
+  generator_fuel_hours: number;
+  divert_status: "NORMAL" | "CAUTION" | "DIVERT_ALL";
+  contact_phone?: string | null;
+  updated_at?: string;
+};
+
+export type RoadHazard = {
+  id: string;
+  hazard_type: string;
+  title: string;
+  description?: string | null;
+  latitude: number;
+  longitude: number;
+  water_depth_cm: number;
+  is_passable_by_boat: boolean;
+  is_active: boolean;
+  reported_at?: string;
+  cleared_at?: string | null;
+};
+
+export type MissingPerson = {
+  id: string;
+  reported_by_phone: string;
+  reported_by_name?: string | null;
+  full_name: string;
+  age?: number | null;
+  gender?: string | null;
+  physical_description?: string | null;
+  clothing_last_seen?: string | null;
+  last_seen_location?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  photo_url?: string | null;
+  status: string;
+  matched_checkin_id?: string | null;
+  reported_at?: string;
+  updated_at?: string;
+};
+
+export type ShelterCheckin = {
+  id: string;
+  shelter_id: string;
+  person_name: string;
+  age?: number | null;
+  gender?: string | null;
+  phone?: string | null;
+  medical_condition?: string | null;
+  checked_in_at?: string;
+};
+
 type Table<Row, Insert = Partial<Row>, Update = Partial<Insert>> = {
   Row: Row;
   Insert: Insert;
@@ -266,6 +328,10 @@ export type Database = {
       assignment_logs: Table<AssignmentLog>;
       alerts: Table<Alert>;
       allocation_weights: Table<AllocationWeight>;
+      hospitals: Table<Hospital>;
+      road_hazards: Table<RoadHazard>;
+      missing_persons: Table<MissingPerson>;
+      shelter_checkins: Table<ShelterCheckin>;
     };
     Views: Record<string, never>;
     Functions: {

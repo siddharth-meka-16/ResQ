@@ -1,5 +1,5 @@
 -- ============================================================
--- RakshaSetu ??" Simulated-incident flag
+-- ResQ ??" Simulated-incident flag
 -- Run in Supabase SQL Editor AFTER 0001..0009
 -- ============================================================
 -- Marks incidents injected by the simulation engine so the demo

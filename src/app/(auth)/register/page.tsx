@@ -62,17 +62,6 @@ export default function RegisterPage() {
       return;
     }
 
-    const selectedRole = ROLES.find((r) => r.value === role);
-    if (selectedRole?.official) {
-      const domain = email.toLowerCase().trim().split("@").pop();
-      if (domain !== "gov.in") {
-        setError(
-          `${selectedRole.label} is an official role — use a government email like name@gov.in`
-        );
-        return;
-      }
-    }
-
     setLoading(true);
 
     const supabase = createClient();
@@ -86,14 +75,29 @@ export default function RegisterPage() {
     });
 
     if (error) {
-      setError(error.message === "Invalid login credentials"
-        ? "Wrong email or password — try again"
-: error.message);
+      setError(
+        error.message === "Invalid login credentials"
+          ? "Wrong email or password — try again"
+          : error.message
+      );
       setLoading(false);
       return;
     }
 
-    // Project may require email confirmation -> no session yet
+    // Auto-login immediately: backend trigger automatically confirms users
+    const { error: loginError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (!loginError) {
+      const dest = await routeByRole("/dashboard");
+      router.push(dest);
+      router.refresh();
+      return;
+    }
+
+    // Fallback if password sign-in didn't immediately succeed
     if (!data.session) {
       setNeedsConfirmation(true);
       setLoading(false);
@@ -109,15 +113,34 @@ export default function RegisterPage() {
     return (
       <main className="flex min-h-screen items-center justify-center px-4">
         <div className="w-full max-w-sm rounded-2xl border border-[var(--color-border)] bg-white p-8 text-center shadow-sm">
-                    <h1 className="mt-3 text-xl font-bold">Check your inbox</h1>
+          <h1 className="mt-3 text-xl font-bold">Account Created</h1>
           <p className="mt-2 text-sm leading-relaxed text-muted">
-            We sent a confirmation link to{" "}
-            <b className="text-foreground">{email}</b>. Click it to activate
-            your account, then log in.
+            Your account for <b className="text-foreground">{email}</b> is ready!
           </p>
+          <button
+            type="button"
+            onClick={async () => {
+              setLoading(true);
+              const supabase = createClient();
+              const { error } = await supabase.auth.signInWithPassword({
+                email,
+                password,
+              });
+              if (!error) {
+                const dest = await routeByRole("/dashboard");
+                router.push(dest);
+                router.refresh();
+              } else {
+                router.push("/login");
+              }
+            }}
+            className="mt-5 inline-flex h-11 w-full items-center justify-center rounded-xl bg-green-600 text-sm font-semibold text-white transition-colors hover:bg-green-700"
+          >
+            ⚡ Click to Enter Dashboard Now
+          </button>
           <Link
             href="/login"
-            className="mt-6 inline-flex h-11 w-full items-center justify-center rounded-xl bg-[var(--color-primary)] text-sm font-semibold text-white transition-colors hover:bg-[var(--color-primary-dark)]"
+            className="mt-3 inline-flex h-11 w-full items-center justify-center rounded-xl border border-[var(--color-border)] text-sm font-semibold text-muted transition-colors hover:bg-gray-100"
           >
             Back to login
           </Link>
@@ -133,7 +156,7 @@ export default function RegisterPage() {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
           <Link href="/" className="flex items-center gap-2">
             <Logo size={48} />
-            <span className="text-sm font-bold tracking-tight">Anvay</span>
+            <span className="text-sm font-bold tracking-tight">ResQ</span>
           </Link>
           <Link
             href="/login"
@@ -150,6 +173,85 @@ export default function RegisterPage() {
           <p className="mt-1 text-sm text-muted">
             Pick the role that describes you — it decides your console.
           </p>
+        </div>
+
+        {/* Quick 1-Click Demo Access */}
+        <div className="mb-6 rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50/80 to-indigo-50/50 p-4 shadow-sm">
+          <div className="mb-2 flex items-center justify-between">
+            <span className="text-xs font-bold uppercase tracking-wider text-blue-900">
+              ⚡ Evaluating for Hackathon? 1-Click Instant Demo Login
+            </span>
+          </div>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            <button
+              type="button"
+              onClick={async () => {
+                const supabase = createClient();
+                await supabase.auth.signInWithPassword({
+                  email: "operator@resq.gov",
+                  password: "ResQ@2026!",
+                });
+                const dest = await routeByRole("/dashboard");
+                router.push(dest);
+                router.refresh();
+              }}
+              className="rounded-xl border border-blue-200 bg-white p-2.5 text-center text-xs font-semibold text-slate-800 shadow-sm transition hover:bg-blue-50 active:scale-95"
+            >
+              <div className="text-base">🛡️</div>
+              <div className="mt-1">Operator</div>
+            </button>
+            <button
+              type="button"
+              onClick={async () => {
+                const supabase = createClient();
+                await supabase.auth.signInWithPassword({
+                  email: "field@resq.gov",
+                  password: "ResQ@2026!",
+                });
+                const dest = await routeByRole("/team");
+                router.push(dest);
+                router.refresh();
+              }}
+              className="rounded-xl border border-blue-200 bg-white p-2.5 text-center text-xs font-semibold text-slate-800 shadow-sm transition hover:bg-blue-50 active:scale-95"
+            >
+              <div className="text-base">🚒</div>
+              <div className="mt-1">Field Team</div>
+            </button>
+            <button
+              type="button"
+              onClick={async () => {
+                const supabase = createClient();
+                await supabase.auth.signInWithPassword({
+                  email: "shelter@resq.gov",
+                  password: "ResQ@2026!",
+                });
+                const dest = await routeByRole("/shelter-manage");
+                router.push(dest);
+                router.refresh();
+              }}
+              className="rounded-xl border border-blue-200 bg-white p-2.5 text-center text-xs font-semibold text-slate-800 shadow-sm transition hover:bg-blue-50 active:scale-95"
+            >
+              <div className="text-base">🏠</div>
+              <div className="mt-1">Shelter Lead</div>
+            </button>
+            <button
+              type="button"
+              onClick={async () => {
+                const supabase = createClient();
+                await supabase.auth.signInWithPassword({
+                  email: "citizen@resq.org",
+                  password: "ResQ@2026!",
+                });
+                const dest = await routeByRole("/citizen");
+                router.push(dest);
+                router.refresh();
+              }}
+              className="rounded-xl border border-blue-200 bg-white p-2.5 text-center text-xs font-semibold text-slate-800 shadow-sm transition hover:bg-blue-50 active:scale-95"
+            >
+              <div className="text-base">👤</div>
+              <div className="mt-1">Citizen</div>
+            </button>
+          </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">

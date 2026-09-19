@@ -40,8 +40,5 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-/docs
+# agent files (auto-generated)
 /AGENTS.md
-/CLAUDE.md
-/analysis.txt
-/SIH_PRESENTATION_DOCUMENTATION.md

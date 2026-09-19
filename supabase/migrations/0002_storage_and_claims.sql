@@ -1,5 +1,5 @@
 -- ============================================================
--- RakshaSetu — Phase 2/4 Additions
+-- ResQ — Phase 2/4 Additions
 -- Run in Supabase SQL Editor AFTER 0001_init.sql
 -- ============================================================
 

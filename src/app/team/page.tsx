@@ -75,12 +75,17 @@ export default function TeamPage() {
     () => teams.filter((t) => t.managed_by_id && t.managed_by_id === userId),
     [teams, userId]
   );
-  const claimable = useMemo(() => teams.filter((t) => !t.managed_by_id), [teams]);
+  const claimable = useMemo(
+    () => teams.filter((t) => t.managed_by_id !== userId),
+    [teams, userId]
+  );
   const teamIds = useMemo(() => new Set(myTeams.map((t) => t.id)), [myTeams]);
   const missions = useMemo(
     () =>
       assignments.filter(
-        (a) => teamIds.has(a.resource_id) && isActiveAssignment(a)
+        (a) =>
+          (teamIds.has(a.resource_id) || (a.team_id && teamIds.has(a.team_id))) &&
+          isActiveAssignment(a)
       ),
     [assignments, teamIds]
   );
@@ -102,10 +107,22 @@ export default function TeamPage() {
     setError(null);
     const supabase = createClient();
     const { error } = await supabase
-.from("resource_teams")
-.update({ managed_by_id: userId })
-.eq("id", teamId)
-.is("managed_by_id", null);
+      .from("resource_teams")
+      .update({ managed_by_id: userId })
+      .eq("id", teamId);
+    if (error) setError(error.message);
+    await Promise.all([loadStatic(), refresh()]);
+    setBusy(false);
+  }
+
+  async function unclaimTeam(teamId: string) {
+    setBusy(true);
+    setError(null);
+    const supabase = createClient();
+    const { error } = await supabase
+      .from("resource_teams")
+      .update({ managed_by_id: null })
+      .eq("id", teamId);
     if (error) setError(error.message);
     await Promise.all([loadStatic(), refresh()]);
     setBusy(false);
@@ -284,9 +301,19 @@ export default function TeamPage() {
                       <b className="truncate">{t.team_code}</b>
                       <span className="truncate text-xs text-muted">{t.name}</span>
                     </div>
-                    <span className="shrink-0 rounded-full bg-gray-100 px-2 py-0.5 text-[11px] font-semibold text-gray-600">
-                      {t.status.replace(/_/g, " ")}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="shrink-0 rounded-full bg-gray-100 px-2 py-0.5 text-[11px] font-semibold text-gray-600">
+                        {t.status.replace(/_/g, " ")}
+                      </span>
+                      <button
+                        disabled={busy}
+                        onClick={() => unclaimTeam(t.id)}
+                        className="text-[11px] text-gray-400 hover:text-red-600 transition-colors cursor-pointer px-1.5 py-0.5 rounded border border-gray-200"
+                        title="Release / Unclaim squad"
+                      >
+                        Release
+                      </button>
+                    </div>
                   </div>
                   <div className="mt-1.5 truncate text-xs text-muted">
                     {t.capabilities.join(" · ") || "general"} · cap {t.capacity}
@@ -319,13 +346,13 @@ export default function TeamPage() {
               ))}
             </div>
           </section>
-        ): null}
+        ) : null}
 
         {/* Claim flow */}
-        {!initialLoading && myTeams.length === 0 && claimable.length > 0 && (
+        {!initialLoading && claimable.length > 0 && (
           <section className="mb-7" aria-label={dict.team.claimYourTeam}>
             <h2 className="mb-3 px-1 text-sm font-bold uppercase tracking-wider text-muted">
-              {dict.team.claimYourTeam}
+              {dict.team.claimYourTeam} ({claimable.length} Available)
             </h2>
             <div className="grid gap-2 sm:grid-cols-2">
               {claimable.map((t) => (
@@ -333,14 +360,14 @@ export default function TeamPage() {
                   key={t.id}
                   disabled={busy}
                   onClick={() => claimTeam(t.id)}
-                  className="flex items-center justify-between rounded-xl border border-[var(--color-border)] bg-white p-4 text-left shadow-sm transition-all hover:border-blue-300 hover:shadow-md active:scale-[0.99]"
+                  className="flex items-center justify-between rounded-xl border border-[var(--color-border)] bg-white p-4 text-left shadow-sm transition-all hover:border-blue-300 hover:shadow-md active:scale-[0.99] cursor-pointer"
                 >
                   <span className="min-w-0">
                     <b>{t.team_code}</b>{" "}
                     <span className="text-xs text-muted">· {t.name}</span>
                   </span>
                   <span className="shrink-0 text-xs font-semibold text-[var(--color-accent)]">
-                    {dict.team.claim}
+                    {dict.team.claim} →
                   </span>
                 </button>
               ))}
@@ -350,7 +377,7 @@ export default function TeamPage() {
 
         {!initialLoading && myTeams.length === 0 && claimable.length === 0 && (
           <div className="mb-7 rounded-2xl border border-dashed border-[var(--color-border)] bg-white p-8 text-center">
-            <div className="text-3xl"></div>
+            <div className="text-3xl">🛡️</div>
             <p className="mt-2 text-sm font-medium">{dict.team.noTeamLinked}</p>
             <p className="mt-1 text-xs text-muted">
               {dict.team.askOperator}

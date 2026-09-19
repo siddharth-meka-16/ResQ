@@ -51,7 +51,7 @@ export default function LoginPage() {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
           <Link href="/" className="flex items-center gap-2">
             <Logo size={48} />
-            <span className="text-sm font-bold tracking-tight">Anvay</span>
+            <span className="text-sm font-bold tracking-tight">ResQ</span>
           </Link>
           <Link
             href="/register"
@@ -68,6 +68,143 @@ export default function LoginPage() {
           <p className="mt-1 text-sm text-muted">
             Log in to your role&apos;s console
           </p>
+        </div>
+
+        {/* Quick Demo Logins for Hackathon Evaluators */}
+        <div className="mb-5 rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50/80 to-indigo-50/50 p-4 shadow-sm">
+          <div className="mb-2.5 flex items-center justify-between">
+            <span className="text-xs font-bold uppercase tracking-wider text-blue-900">
+              ⚡ 1-Click Demo Logins
+            </span>
+            <span className="rounded-full bg-blue-200/60 px-2 py-0.5 text-[10px] font-semibold text-blue-800">
+              Instant Access
+            </span>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              disabled={loading}
+              onClick={async () => {
+                setEmail("operator@resq.gov");
+                setPassword("ResQ@2026!");
+                setLoading(true);
+                setError(null);
+                const supabase = createClient();
+                const { error } = await supabase.auth.signInWithPassword({
+                  email: "operator@resq.gov",
+                  password: "ResQ@2026!",
+                });
+                if (error) {
+                  setError(error.message);
+                  setLoading(false);
+                  return;
+                }
+                const dest = await routeByRole("/dashboard");
+                router.push(dest);
+                router.refresh();
+              }}
+              className="flex items-center gap-2 rounded-xl border border-blue-200 bg-white px-3 py-2 text-left text-xs font-semibold text-slate-800 shadow-sm transition hover:bg-blue-50 active:scale-95"
+            >
+              <span className="text-base">🛡️</span>
+              <div>
+                <div>Control Room</div>
+                <div className="text-[10px] text-muted">Operator</div>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              disabled={loading}
+              onClick={async () => {
+                setEmail("field@resq.gov");
+                setPassword("ResQ@2026!");
+                setLoading(true);
+                setError(null);
+                const supabase = createClient();
+                const { error } = await supabase.auth.signInWithPassword({
+                  email: "field@resq.gov",
+                  password: "ResQ@2026!",
+                });
+                if (error) {
+                  setError(error.message);
+                  setLoading(false);
+                  return;
+                }
+                const dest = await routeByRole("/team");
+                router.push(dest);
+                router.refresh();
+              }}
+              className="flex items-center gap-2 rounded-xl border border-blue-200 bg-white px-3 py-2 text-left text-xs font-semibold text-slate-800 shadow-sm transition hover:bg-blue-50 active:scale-95"
+            >
+              <span className="text-base">🚒</span>
+              <div>
+                <div>Field Team</div>
+                <div className="text-[10px] text-muted">Rescue Ops</div>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              disabled={loading}
+              onClick={async () => {
+                setEmail("shelter@resq.gov");
+                setPassword("ResQ@2026!");
+                setLoading(true);
+                setError(null);
+                const supabase = createClient();
+                const { error } = await supabase.auth.signInWithPassword({
+                  email: "shelter@resq.gov",
+                  password: "ResQ@2026!",
+                });
+                if (error) {
+                  setError(error.message);
+                  setLoading(false);
+                  return;
+                }
+                const dest = await routeByRole("/shelter-manage");
+                router.push(dest);
+                router.refresh();
+              }}
+              className="flex items-center gap-2 rounded-xl border border-blue-200 bg-white px-3 py-2 text-left text-xs font-semibold text-slate-800 shadow-sm transition hover:bg-blue-50 active:scale-95"
+            >
+              <span className="text-base">🏠</span>
+              <div>
+                <div>Shelter Lead</div>
+                <div className="text-[10px] text-muted">Relief Supplies</div>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              disabled={loading}
+              onClick={async () => {
+                setEmail("citizen@resq.org");
+                setPassword("ResQ@2026!");
+                setLoading(true);
+                setError(null);
+                const supabase = createClient();
+                const { error } = await supabase.auth.signInWithPassword({
+                  email: "citizen@resq.org",
+                  password: "ResQ@2026!",
+                });
+                if (error) {
+                  setError(error.message);
+                  setLoading(false);
+                  return;
+                }
+                const dest = await routeByRole("/citizen");
+                router.push(dest);
+                router.refresh();
+              }}
+              className="flex items-center gap-2 rounded-xl border border-blue-200 bg-white px-3 py-2 text-left text-xs font-semibold text-slate-800 shadow-sm transition hover:bg-blue-50 active:scale-95"
+            >
+              <span className="text-base">👤</span>
+              <div>
+                <div>Citizen</div>
+                <div className="text-[10px] text-muted">Portal</div>
+              </div>
+            </button>
+          </div>
         </div>
 
         <form

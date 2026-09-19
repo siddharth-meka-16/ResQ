@@ -5,9 +5,8 @@ import { useTranslation, SUPPORTED_LANGUAGES } from "@/context/LanguageContext";
 import { Locale } from "@/types/i18n";
 
 const LANG_FLAGS: Record<string, string> = {
-  en: "🇬🇧",
+  en: "🌐",
   hi: "🇮🇳",
-  or: "🟠",
 };
 
 interface LanguageSelectorProps {

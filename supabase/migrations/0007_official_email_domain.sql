@@ -1,5 +1,5 @@
 -- ============================================================
--- RakshaSetu — Official accounts require a .gov.in email
+-- ResQ — Official accounts require a .gov.in email
 -- Run in Supabase SQL Editor AFTER 0001..0006
 -- ============================================================
 

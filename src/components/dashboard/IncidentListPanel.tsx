@@ -47,21 +47,25 @@ export function IncidentListPanel({
     if (q)
       list = list.filter(
         (i) =>
-          i.incident_number.toLowerCase().includes(q) ||
-          i.description.toLowerCase().includes(q) ||
-          (i.location_text ?? "").toLowerCase().includes(q)
+          (i.incident_number || "").toLowerCase().includes(q) ||
+          (i.description || "").toLowerCase().includes(q) ||
+          (i.location_text || "").toLowerCase().includes(q)
       );
     return list.sort((a, b) => {
       const order = { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3 };
-      return order[a.severity] - order[b.severity];
+      const aOrder = order[a.severity] ?? 2;
+      const bOrder = order[b.severity] ?? 2;
+      return aOrder - bOrder;
     });
   }, [incidents, filter, search]);
 
-  const getSeverityLabel = (sev: string) => {
+  const getSeverityLabel = (sev?: string) => {
+    if (!sev) return "MEDIUM";
     return (dict.incidents.severities as Record<string, string>)[sev] ?? sev;
   };
 
-  const getCategoryLabel = (cat: string) => {
+  const getCategoryLabel = (cat?: string) => {
+    if (!cat) return "Emergency";
     return (dict.incidents.categories as Record<string, string>)[cat] ?? cat.replace(/_/g, " ");
   };
 
@@ -103,20 +107,22 @@ export function IncidentListPanel({
             }`}
           >
             <div className="flex items-center justify-between gap-2">
-              <span className="font-mono text-xs text-muted">{i.incident_number}</span>
+              <span className="font-mono text-xs text-muted">
+                {i.incident_number || `INC-${(i.id || "").slice(0, 6).toUpperCase()}`}
+              </span>
               <Badge label={getSeverityLabel(i.severity)} color={i.severity} />
             </div>
             <p className="mt-1 line-clamp-2 text-sm">{i.description}</p>
             <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-muted">
               <span>{getCategoryLabel(i.type)}</span>
               <span>·</span>
-              <span>{i.people_affected}</span>
+              <span>{i.people_affected ?? (i as any).trapped_count ?? 1} affected</span>
               <span>·</span>
               <span
                 title={dict.incidents.aiConfidence}
-                className={i.confidence_score >= 0.8 ? "font-medium text-green-600" : ""}
+                className={(i.confidence_score ?? 0.8) >= 0.8 ? "font-medium text-green-600" : ""}
               >
-                {Math.round(i.confidence_score * 100)}%
+                {Math.round((i.confidence_score ?? 0.8) * 100)}%
               </span>
               {clusterSizes && clusterSizes.has(i.id) && (
                 <span className="rounded-full bg-blue-50 px-1.5 text-[10px] font-medium text-blue-700">

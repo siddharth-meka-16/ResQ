@@ -54,10 +54,10 @@ export function useLiveData(): LiveData {
         .order("assigned_at", { ascending: false })
         .limit(200),
     ]);
-    if (inc.data) setIncidents(inc.data);
-    if (tm.data) setTeams(tm.data);
-    if (sh.data) setShelters(sh.data);
-    if (asg.data) setAssignments(asg.data);
+    if (inc.data) setIncidents(inc.data.map(normalizeIncident));
+    if (tm.data) setTeams(tm.data.map(normalizeTeam));
+    if (sh.data) setShelters(sh.data.map(normalizeShelter));
+    if (asg.data) setAssignments(asg.data.map(normalizeAssignment));
 
     const { data: al } = await supabase
       .from("alerts")
@@ -140,6 +140,51 @@ export function useLiveData(): LiveData {
   };
 }
 
+function normalizeIncident(raw: any): Incident {
+  return {
+    ...raw,
+    incident_number: raw.incident_number || `INC-${(raw.id || "").slice(0, 6).toUpperCase()}`,
+    type: raw.type || raw.incident_type || "OTHER",
+    severity: raw.severity || "MEDIUM",
+    status: raw.status || "REPORTED",
+    description: raw.description || raw.title || "Emergency incident reported",
+    people_affected: Number(raw.people_affected ?? raw.trapped_count ?? 1),
+    trapped_count: Number(raw.trapped_count ?? raw.people_affected ?? 1),
+    location_text: raw.location_text || raw.landmark || raw.address || null,
+    confidence_score: Number(raw.confidence_score ?? 0.8),
+    required_capabilities: Array.isArray(raw.required_capabilities) ? raw.required_capabilities : [],
+  };
+}
+
+function normalizeShelter(raw: any): Shelter {
+  return {
+    ...raw,
+    total_capacity: Number(raw.total_capacity ?? raw.capacity ?? 100),
+    capacity: Number(raw.capacity ?? raw.total_capacity ?? 100),
+    current_occupancy: Number(raw.current_occupancy ?? 0),
+    managed_by_id: raw.managed_by_id ?? null,
+  };
+}
+
+function normalizeTeam(raw: any): ResourceTeam {
+  return {
+    ...raw,
+    managed_by_id: raw.managed_by_id ?? null,
+    capabilities: Array.isArray(raw.capabilities) ? raw.capabilities : [],
+    capacity: Number(raw.capacity ?? 4),
+    status: raw.status || "AVAILABLE",
+  };
+}
+
+function normalizeAssignment(raw: any): Assignment {
+  return {
+    ...raw,
+    resource_id: raw.resource_id || raw.team_id || "",
+    team_id: raw.team_id || raw.resource_id || "",
+    status: raw.status || "PENDING",
+  };
+}
+
 function applyChange<T extends { id: string }>(
   setter: (updater: (prev: T[]) => T[]) => void,
   payload: ChangePayload
@@ -147,14 +192,24 @@ function applyChange<T extends { id: string }>(
   setter((prev) => {
     switch (payload.eventType) {
       case "INSERT": {
-        const row = payload.new as T;
-        return prev.some((r) => r.id === row.id)
-          ? prev.map((r) => (r.id === row.id ? row : r))
-          : [row, ...prev];
+        let row = payload.new as any;
+        if (row && "incident_type" in row) row = normalizeIncident(row);
+        if (row && "capacity" in row && "current_occupancy" in row) row = normalizeShelter(row);
+        if (row && "team_code" in row) row = normalizeTeam(row);
+        if (row && ("team_id" in row || "resource_id" in row)) row = normalizeAssignment(row);
+        const typedRow = row as T;
+        return prev.some((r) => r.id === typedRow.id)
+          ? prev.map((r) => (r.id === typedRow.id ? typedRow : r))
+          : [typedRow, ...prev];
       }
       case "UPDATE": {
-        const row = payload.new as T;
-        return prev.map((r) => (r.id === row.id ? row : r));
+        let row = payload.new as any;
+        if (row && "incident_type" in row) row = normalizeIncident(row);
+        if (row && "capacity" in row && "current_occupancy" in row) row = normalizeShelter(row);
+        if (row && "team_code" in row) row = normalizeTeam(row);
+        if (row && ("team_id" in row || "resource_id" in row)) row = normalizeAssignment(row);
+        const typedRow = row as T;
+        return prev.map((r) => (r.id === typedRow.id ? typedRow : r));
       }
       case "DELETE": {
         const old = payload.old as { id?: string };

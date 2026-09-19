@@ -6,7 +6,7 @@ import type {
 } from "@/types/database";
 
 // ============================================================
-// RakshaSetu Allocation Engine
+// ResQ Autonomous Allocation Engine
 //
 // Transparent, weighted multi-factor scoring:
 //   Score = w.sev*Severity + w.eta*ETA + w.cap*Capability
@@ -73,6 +73,8 @@ export function haversineKm(
     Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
   return R * 2 * Math.asin(Math.sqrt(a));
 }
+
+export const haversineDistanceKm = haversineKm;
 
 function toRad(deg: number): number {
   return (deg * Math.PI) / 180;

@@ -161,6 +161,7 @@ export async function POST(request: NextRequest) {
 
   const payload = {
     reporter_id: reporterId,
+    title: description.slice(0, 60),
     description,
     latitude,
     longitude,
@@ -168,15 +169,26 @@ export async function POST(request: NextRequest) {
       typeof body.location_text === "string" && body.location_text.trim()
         ? body.location_text.trim()
         : null,
+    address:
+      typeof body.location_text === "string" && body.location_text.trim()
+        ? body.location_text.trim()
+        : null,
+    landmark:
+      typeof body.location_text === "string" && body.location_text.trim()
+        ? body.location_text.trim()
+        : null,
     people_affected,
+    trapped_count: people_affected,
     required_capabilities,
     confidence_score: confidence,
     verification_status: verificationFor(confidence),
     severity,
     type,
+    incident_type: type,
     source,
     photo_url,
     cluster_id: clusterHeadId,
+    is_simulated: false,
     ai_classification: {
       by: ai.classifiedBy,
       suggested_type: ai.type,
@@ -186,7 +198,7 @@ export async function POST(request: NextRequest) {
 
   let { data: incident, error } = await supabase
     .from("incidents")
-    .insert(payload)
+    .insert(payload as any)
     .select("*")
     .single();
 
@@ -202,7 +214,7 @@ export async function POST(request: NextRequest) {
     );
     ({ data: incident, error } = await anon
       .from("incidents")
-      .insert({ ...payload, reporter_id: null })
+      .insert({ ...payload, reporter_id: null } as any)
       .select("*")
       .single());
   }

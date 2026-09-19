@@ -2,7 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
 
 // ============================================================
-// RakshaSetu Disaster Simulation Engine
+// ResQ Disaster Simulation Engine
 //
 // Replays a scripted flood scenario into the live system so the
 // demo never depends on real disasters or external APIs.
@@ -46,7 +46,7 @@ export interface Scenario {
 export const SCENARIOS: Scenario[] = [
   {
     id: "flood-rourkela",
-    name: "Flood — Rourkela (Koel River)",
+    name: "Rapid Urban Flash Flood (Central River Inundation)",
     description:
       "Escalating river flood: rising reports, a critical rescue, team breakdown, shelter nearing capacity.",
     durationSec: 75,

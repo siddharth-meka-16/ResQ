@@ -1,5 +1,5 @@
 -- ============================================================
--- RakshaSetu ??" Reset/delete policies
+-- ResQ ??" Reset/delete policies
 -- Run in Supabase SQL Editor AFTER 0001..0008
 -- ============================================================
 -- The demo-reset endpoint deletes simulated incidents and their

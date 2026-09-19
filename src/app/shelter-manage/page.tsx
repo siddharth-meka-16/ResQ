@@ -52,18 +52,29 @@ export default function ShelterManagePage() {
     [shelters, userId]
   );
   const claimable = useMemo(
-    () => shelters.filter((s) => !s.managed_by_id),
-    [shelters]
+    () => shelters.filter((s) => s.managed_by_id !== userId),
+    [shelters, userId]
   );
 
   async function claimShelter(shelterId: string) {
     setBusyId(shelterId);
     setError(null);
     const { error } = await createClient()
-.from("shelters")
-.update({ managed_by_id: userId })
-.eq("id", shelterId)
-.is("managed_by_id", null);
+      .from("shelters")
+      .update({ managed_by_id: userId })
+      .eq("id", shelterId);
+    if (error) setError(error.message);
+    await refresh();
+    setBusyId(null);
+  }
+
+  async function unclaimShelter(shelterId: string) {
+    setBusyId(shelterId);
+    setError(null);
+    const { error } = await createClient()
+      .from("shelters")
+      .update({ managed_by_id: null })
+      .eq("id", shelterId);
     if (error) setError(error.message);
     await refresh();
     setBusyId(null);
@@ -171,10 +182,10 @@ export default function ShelterManagePage() {
         </section>
 
         {/* Claim flow */}
-        {!initialLoading && myShelters.length === 0 && claimable.length > 0 && (
+        {!initialLoading && claimable.length > 0 && (
           <section className="mb-7" aria-label={dict.shelterManage.claimYourShelter}>
             <h2 className="mb-3 px-1 text-sm font-bold uppercase tracking-wider text-muted">
-              {dict.shelterManage.claimYourShelter}
+              {dict.shelterManage.claimYourShelter} ({claimable.length} Available)
             </h2>
             <div className="grid gap-2 sm:grid-cols-2">
               {claimable.map((s) => (
@@ -182,14 +193,14 @@ export default function ShelterManagePage() {
                   key={s.id}
                   disabled={busyId === s.id}
                   onClick={() => claimShelter(s.id)}
-                  className="flex items-center justify-between rounded-xl border border-[var(--color-border)] bg-white p-4 text-left shadow-sm transition-all hover:border-blue-300 hover:shadow-md active:scale-[0.99]"
+                  className="flex items-center justify-between rounded-xl border border-[var(--color-border)] bg-white p-4 text-left shadow-sm transition-all hover:border-blue-300 hover:shadow-md active:scale-[0.99] cursor-pointer"
                 >
                   <span className="min-w-0">
                     <b className="block truncate"> {s.name}</b>
                     <span className="text-xs text-muted">{s.address}</span>
                   </span>
                   <span className="shrink-0 text-xs font-semibold text-[var(--color-accent)]">
-                    {dict.shelterManage.claim}
+                    {dict.shelterManage.claim} →
                   </span>
                 </button>
               ))}
@@ -204,15 +215,15 @@ export default function ShelterManagePage() {
               <Skeleton key={n} className="h-48 rounded-2xl" />
             ))}
           </ul>
-        ): myShelters.length === 0 ? (
+        ) : myShelters.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-[var(--color-border)] bg-white p-8 text-center">
-            <div className="text-3xl"></div>
+            <div className="text-3xl">🏠</div>
             <p className="mt-2 text-sm font-medium">{dict.shelterManage.noSheltersAssigned}</p>
             <p className="mt-1 text-xs text-muted">
               {dict.shelterManage.askOperator}
             </p>
           </div>
-        ): (
+        ) : (
           <ul className="space-y-4 lg:grid lg:grid-cols-2 lg:gap-4 lg:space-y-0">
             {myShelters.map((s) => (
               <li key={s.id}>
@@ -221,6 +232,7 @@ export default function ShelterManagePage() {
                   busy={busyId === s.id}
                   onAdjust={(d) => adjustOccupancy(s, d)}
                   onRefresh={refresh}
+                  onUnclaim={() => unclaimShelter(s.id)}
                 />
               </li>
             ))}
@@ -236,11 +248,13 @@ function ShelterCard({
   busy,
   onAdjust,
   onRefresh,
+  onUnclaim,
 }: {
   shelter: Shelter;
   busy: boolean;
   onAdjust: (delta: number) => void;
   onRefresh: () => void;
+  onUnclaim?: () => void;
 }) {
   const { dict } = useTranslation();
   const pct = Math.min(
@@ -248,7 +262,7 @@ function ShelterCard({
     Math.round((shelter.current_occupancy / shelter.total_capacity) * 100)
   );
   const barColor =
-    pct >= 90 ? "#dc2626": pct >= 50 ? "#d97706": "#16a34a";
+    pct >= 90 ? "#dc2626" : pct >= 50 ? "#d97706" : "#16a34a";
   const closed = shelter.status === "CLOSED";
 
   const statusLabels = dict.shelterManage.occupancyStatus;
@@ -269,13 +283,25 @@ function ShelterCard({
           <h3 className="truncate text-base font-bold">{shelter.name}</h3>
           <p className="mt-0.5 truncate text-xs text-muted">{shelter.address}</p>
         </div>
-        <span
-          className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold ${
-            STATUS_STYLES[shelter.status] ?? STATUS_STYLES.OPEN
-          }`}
-        >
-          {statusLabel}
-        </span>
+        <div className="flex items-center gap-2">
+          <span
+            className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold ${
+              STATUS_STYLES[shelter.status] ?? STATUS_STYLES.OPEN
+            }`}
+          >
+            {statusLabel}
+          </span>
+          {onUnclaim && (
+            <button
+              disabled={busy}
+              onClick={onUnclaim}
+              className="text-[11px] text-gray-400 hover:text-red-600 transition-colors cursor-pointer px-1.5 py-0.5 rounded border border-gray-200"
+              title="Release / Unclaim shelter"
+            >
+              Release
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Occupancy */}

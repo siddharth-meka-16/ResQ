@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
         severity: parsed.severity,
         people_affected: parsed.peopleAffected,
       },
-      reply: `Anvay: Report ${incident.incident_number} received. Help is being coordinated. Keep this number for reference.`,
+      reply: `ResQ: Report ${incident.incident_number} received. Help is being coordinated. Keep this number for reference.`,
     },
     { status: 201 }
   );

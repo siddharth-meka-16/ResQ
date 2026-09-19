@@ -2,7 +2,7 @@ import { TranslationDictionary } from "@/types/i18n";
 
 export const en: TranslationDictionary = {
   common: {
-    appName: "Anvay",
+    appName: "ResQ",
     controlRoom: "Control Room",
     realtimeConnected: "Realtime connected",
     reconnecting: "Reconnecting…",
@@ -261,7 +261,7 @@ export const en: TranslationDictionary = {
     resetting: "Resetting…",
     timeline: "Live Event Timeline",
     scenarios: "Available Scenarios",
-    koelFloodScenario: "Koel River Flash Flood (Rourkela)",
+    koelFloodScenario: "Rapid Flash Flood (Urban Sector Alpha)",
     speed: "Speed",
     elapsed: "Elapsed",
   },

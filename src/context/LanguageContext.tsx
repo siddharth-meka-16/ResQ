@@ -13,7 +13,7 @@ interface LanguageContextValue {
 
 const LanguageContext = createContext<LanguageContextValue | null>(null);
 
-const STORAGE_KEY = "anvay_language";
+const STORAGE_KEY = "resq_language";
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>("en");
@@ -24,7 +24,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       await Promise.resolve();
       try {
         const stored = localStorage.getItem(STORAGE_KEY) as Locale | null;
-        if (stored && (stored === "en" || stored === "hi" || stored === "or")) {
+        if (stored && (stored === "en" || stored === "hi")) {
           setLocaleState(stored);
           document.documentElement.lang = stored;
         }
@@ -98,5 +98,7 @@ export function useTranslation() {
   }
   return context;
 }
+
+export const useLanguage = useTranslation;
 
 export { SUPPORTED_LANGUAGES };

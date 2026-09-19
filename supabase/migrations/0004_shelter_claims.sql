@@ -1,5 +1,5 @@
 -- ============================================================
--- RakshaSetu — Shelter Manager Claims
+-- ResQ — Shelter Manager Claims
 -- Run in Supabase SQL Editor AFTER 0001..0003
 -- ============================================================
 

@@ -2,7 +2,7 @@ import { TranslationDictionary } from "@/types/i18n";
 
 export const hi: TranslationDictionary = {
   common: {
-    appName: "अन्वय",
+    appName: "ResQ (रेस्क्यू)",
     controlRoom: "नियंत्रण कक्ष",
     realtimeConnected: "लाइव कनेक्टेड",
     reconnecting: "पुनः कनेक्ट हो रहा है…",
@@ -261,7 +261,7 @@ export const hi: TranslationDictionary = {
     resetting: "रीसेट हो रहा है…",
     timeline: "लाइव घटना समयरेखा",
     scenarios: "उपलब्ध परिदृश्य",
-    koelFloodScenario: "कोयल नदी अचानक बाढ़ (राउरकेला)",
+    koelFloodScenario: "तीव्र बाढ़ आपातकाल (शहरी सेक्टर अल्फा)",
     speed: "गति",
     elapsed: "बीता समय",
   },
